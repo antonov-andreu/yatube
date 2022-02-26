@@ -51,6 +51,10 @@ git clone https://github.com/antonov-andreu/yatube
 ```
 python -m venv env
 ```
+Включаем Debug режим в settings.py
+```
+DEBUG = True
+```
 Активируем виртуальное окружение(для windows)
 ```
 source env/scripts/activate
@@ -84,13 +88,39 @@ python manage.py createsuperuser
 ```
 python manage.py runserver
 ```
-
 После запуска проект будет доступен по адресу  http://127.0.0.1:8000/
 
 Админ панель будет доступна по адресу  http://127.0.0.1:8000/admin
 
 (Для прекращения работы проекта в терминале Pycharm нужно нажать control + c )
 
+##Для запуска проекта в docker
+Выключаем Debug режим в settings.py
+```
+DEBUG = False
+```
+Создаем в корневой папке проекта файл .env c переменными окружения для работы с базой данных
+```
+DB_ENGINE=django.db.backends.postgresql # указываем, что работаем с postgresql
+DB_NAME=postgres # имя базы данных
+POSTGRES_USER=postgres # логин для подключения к базе данных
+POSTGRES_PASSWORD=postgres # пароль для подключения к БД (установите свой)
+DB_HOST=db # название сервиса (контейнера)
+DB_PORT=5432 # порт для подключения к БД 
+```
+Зпускаем сборку докера
+```
+docker-compose up -d --build 
+```
+Далее делаем миграции, создаем суперпользователя и собираем статику
+```
+docker-compose exec web python manage.py migrate
+docker-compose exec web python manage.py createsuperuser
+docker-compose exec web python manage.py collectstatic --no-input
+```
+После запуска проект будет доступен по адресу  http://localhost/
+
+Админ панель будет доступна по адресу  http://localhost/admin
 ## Технологический стек:
 - [Python3](https://www.python.org/)
 - [Django](https://www.djangoproject.com/)
